@@ -1,7 +1,16 @@
-const express = require("express")
+const express = require("express");
+const multer = require("multer");
 
-const { } = require("./../controllers/csvController")
+const { uploadCSV } = require("./../controllers/csvController");
 
-const router = express.Router()
+// const uploadCSVFile = require("./../utils/fileUpload");
 
-router.route("/").get()
+const upload = multer({ dest: "tmp/csv/" });
+
+const router = express.Router();
+
+// router.route("/upload").post(uploadCSV);
+router.route("/upload").post(upload.single("file"), uploadCSV);
+// router.route("/upload").post(uploadCSVFile, uploadCSV);
+
+module.exports = router;
