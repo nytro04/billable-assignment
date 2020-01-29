@@ -1,7 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
-const multer = require("multer");
-const csv = require("csvtojson");
+const cors = require("cors");
+// const multer = require("multer");
+// const csv = require("csvtojson");
 
 const csvRoute = require("./routes/csvRoute");
 const AppError = require("./utils/AppError");
@@ -14,6 +15,8 @@ const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+app.use(cors());
 
 // Body parser, reading data from body into req.body
 // app.use(express.json());

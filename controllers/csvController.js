@@ -4,16 +4,16 @@
 const csv = require("csvtojson");
 
 const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/AppError");
+// const AppError = require("./../utils/AppError");
 
-const testCSV = "./testCSV.csv";
+// const testCSV = "./testCSV.csv";
 
 exports.uploadCSV = catchAsync(async (req, res, next) => {
-  const jsonArray = await csv({}).fromFile(testCSV);
+  const jsonArray = await csv({}).fromFile(req.file.path);
 
   // console.log("file", testCSV);
 
-  // console.log(jsonArray);
+  console.log(jsonArray);
 
   res.status(200).json({
     status: "success",
