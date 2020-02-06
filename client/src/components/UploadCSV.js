@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-import slugify from "slugify";
+
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 class UploadCSV extends Component {
   state = {
@@ -9,28 +11,41 @@ class UploadCSV extends Component {
     jsonData: []
   };
 
-  renderTableData = () => {
-    return this.state.jsonData.map((report, index) => {
-      console.log(report);
+  exportPDF = () => {
+    const unit = "pt";
+    const size = "A4";
+    const orientation = "portrait";
 
-      // console.log(JSON.parse(report));
-      const { field1, field2, field3, field4, field5, field6 } = report;
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
 
-      // console.log("employee id", employeeId);
-      // console.log("company name", name);
+    doc.setFontSize(14);
 
-      return (
-        <tr key={index}>
-          <td>{field1}</td>
-          <td>{field2}</td>
-          <td>{field3}</td>
-          <td>{field4}</td>
-          <td>{field5}</td>
-          <td>{field6}</td>
-        </tr>
-      );
-    });
+    const title = `Company: ${this.state.jsonData[0].name} `;
+    const headers = Object.entries(this.state.jsonData[0])[1];
+
+    console.log(headers);
+
+    const data = this.state.jsonData.map(el => [
+      el.field1,
+      el.field2,
+      el.field3,
+      el.field4,
+      el.field5,
+      el.field6
+    ]);
+
+    let content = {
+      startY: 50,
+      // head:
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    doc.autoTable(content);
+    doc.save("receipt.pdf");
   };
+
 
   handleUpload = e => {
     e.preventDefault();
@@ -50,20 +65,6 @@ class UploadCSV extends Component {
       .catch(error => {
         console.log(error);
       });
-
-    // let reader = new FileReader();
-    // let file = e.target.files[0];
-
-    // reader.onloadend = () => {
-    //   this.setState({
-    //     file,
-    //     imagePreviewUrl: reader.result
-    //   });
-    // };
-
-    // reader.readAsDataURL(file);
-
-    // console.log(file);
   };
 
   handleSubmit = e => {
@@ -92,39 +93,14 @@ class UploadCSV extends Component {
         </form>
 
         <h2>HTML REPORT</h2>
-        <div>
-          <table>
-            <tbody>{this.renderTableData()}</tbody>
-            {/* <tbody>
-              {jsonData.map((report, index) => (
-                <tr key={index}>
-                  <td>test this</td>
-                  <td>{report.employeeId}</td>
-                  <td>{report.billableRate}</td>
-                  <td>{report.name}</td>
-                  <td>{report.date}</td>
-                  <td>{report.timeIn}</td>
-                  <td>{report.timeOut}</td>
-                </tr>
-              ))}
-            </tbody> */}
-          </table>
-        </div>
-        {/* <form onSubmit={this.handleSubmit}>
-          <div className="custom-file">
-            <input
-              type="file"
-              className="custom-file-input"
-              id="customFile"
-              onChange={this.handleChange}
-              name="file"
-            />
-            <label className="custom-file-label" htmlFor="customFile"></label>
-          </div>
-        </form> */}
+
+        <button onClick={() => this.exportPDF()}>Generate Report</button>
+
+        <div></div>
       </div>
     );
   }
 }
 
 export default UploadCSV;
+
