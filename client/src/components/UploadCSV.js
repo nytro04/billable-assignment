@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import moment from "moment";
 
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -7,7 +8,7 @@ import "jspdf-autotable";
 class UploadCSV extends Component {
   state = {
     file: "",
-    imagePreviewUrl: "",
+    // company: "",
     jsonData: []
   };
 
@@ -21,31 +22,52 @@ class UploadCSV extends Component {
 
     doc.setFontSize(14);
 
-    const title = `Company: ${this.state.jsonData[0].name} `;
-    const headers = Object.entries(this.state.jsonData[0])[1];
+    const headers = [["Employee ID", "Number of Hours", "Unit Price", "Cost"]];
 
-    console.log(headers);
+    // remove header from csv
+    const data = this.state.jsonData.filter(el => {
+      return el.field1 !== "Employee ID";
+    });
 
-    const data = this.state.jsonData.map(el => [
-      el.field1,
-      el.field2,
-      el.field3,
-      el.field4,
-      el.field5,
-      el.field6
-    ]);
+    const newData = data.filter(el => {
+      return el.field1 !== "2";
+    });
+
+    console.log(newData);
+
+    let company;
+
+    const newDataData = newData.map(el => {
+      company = el.field3;
+
+      const endTime = moment(el.field6, "HH:mm");
+      const startTime = moment(el.field5, "HH:mm");
+
+      const duration = moment.duration(endTime.diff(startTime));
+
+      const hours = parseInt(duration.asHours());
+
+      console.log(hours);
+
+      const billable = el.field2 * hours;
+
+      return [el.field1, hours, el.field2, billable];
+    });
+
+    const title = `Company: ${company}`;
+
+    console.log(title);
 
     let content = {
       startY: 50,
-      // head:
-      body: data
+      head: headers,
+      body: newDataData
     };
 
     doc.text(title, marginLeft, 40);
     doc.autoTable(content);
     doc.save("receipt.pdf");
   };
-
 
   handleUpload = e => {
     e.preventDefault();
@@ -103,4 +125,3 @@ class UploadCSV extends Component {
 }
 
 export default UploadCSV;
-
