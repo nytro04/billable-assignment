@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 3. Run "npm install" to install the necessary dependencies.
 ```
 
-### Compiles and hot-reloads for development
+### Running Development Server
 
 ```
 4. Run "npm run dev" to start running the development server.
