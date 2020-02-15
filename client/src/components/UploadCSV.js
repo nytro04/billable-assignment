@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import axios from "axios";
 import moment from "moment";
 
+import swal from "sweetalert";
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -58,6 +60,7 @@ class UploadCSV extends Component {
       doc.text(title, marginLeft, 40);
       doc.autoTable(content);
       doc.save(`${title}.pdf`);
+
       // doc.save("receipt.pdf");
     });
   };
@@ -76,9 +79,18 @@ class UploadCSV extends Component {
 
         const jsonData = res.data.data.csvData;
         this.setState({ jsonData });
+        swal({
+          title: "File Successfully Uploaded!",
+          icon: "success"
+        });
       })
       .catch(error => {
-        console.log(error);
+        swal({
+          title: "😢",
+          text: "Trouble Uploading File, Please try again!",
+          icon: "danger"
+        });
+        // console.log(error);
       });
   };
 
@@ -87,25 +99,25 @@ class UploadCSV extends Component {
     console.log(jsonData);
     return (
       <div className="container py-5">
-        <h3 className="text-center mb-5">CSV TO HTML</h3>
+        <h3 className="mb-5">CSV TO HTML</h3>
         <form onSubmit={this.handleUpload}>
           <div className="form-group">
             <input
               type="file"
-              className="form-control"
+              className="form-control w-50"
               ref={ref => {
                 this.uploadInput = ref;
               }}
             />
           </div>
-          <button className="btn btn-info my-4">Upload</button>
+          <button className="btn btn-info my-4">Click to Upload CSV</button>
         </form>
 
         <button
           className="btn btn-success my-4"
           onClick={() => this.exportPDF()}
         >
-          Generate Report
+          Click to Generate PDF Report
         </button>
 
         <div></div>
