@@ -29,16 +29,8 @@ class UploadCSV extends Component {
       return el.field1 !== "Employee ID";
     });
 
-    const newData = data.filter(el => {
-      return el.field1 !== "2";
-    });
-
-    console.log(newData);
-
-    let company;
-
-    const newDataData = newData.map(el => {
-      company = el.field3;
+    const newDataData = data.map(el => {
+      // company = el.field3;
 
       const endTime = moment(el.field6, "HH:mm");
       const startTime = moment(el.field5, "HH:mm");
@@ -47,26 +39,27 @@ class UploadCSV extends Component {
 
       const hours = parseInt(duration.asHours());
 
-      console.log(hours);
+      const title = `Company: ${[el.field3]}`;
 
       const billable = el.field2 * hours;
 
-      return [el.field1, hours, el.field2, billable];
+      let content = {
+        startY: 50,
+        head: headers,
+        body: [
+          [el.field1, hours, el.field2, billable],
+          ["", "", "", ""],
+          ["", "", "Total", billable]
+        ]
+      };
+
+      console.log(content);
+
+      doc.text(title, marginLeft, 40);
+      doc.autoTable(content);
+      doc.save(`${title}.pdf`);
+      // doc.save("receipt.pdf");
     });
-
-    const title = `Company: ${company}`;
-
-    console.log(title);
-
-    let content = {
-      startY: 50,
-      head: headers,
-      body: newDataData
-    };
-
-    doc.text(title, marginLeft, 40);
-    doc.autoTable(content);
-    doc.save("receipt.pdf");
   };
 
   handleUpload = e => {
@@ -89,12 +82,6 @@ class UploadCSV extends Component {
       });
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-
-    // do render html
-  };
-
   render() {
     const { jsonData } = this.state;
     console.log(jsonData);
@@ -111,12 +98,15 @@ class UploadCSV extends Component {
               }}
             />
           </div>
-          <button className="btn btn-info">Upload</button>
+          <button className="btn btn-info my-4">Upload</button>
         </form>
 
-        <h2>HTML REPORT</h2>
-
-        <button onClick={() => this.exportPDF()}>Generate Report</button>
+        <button
+          className="btn btn-success my-4"
+          onClick={() => this.exportPDF()}
+        >
+          Generate Report
+        </button>
 
         <div></div>
       </div>
